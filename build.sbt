@@ -9,7 +9,7 @@ val btVersion: String = {
 }
 
 name := "backend-auth"
-version := "1.0"
+version := btVersion
 scalaVersion := "2.11.10"
 organization := "com.cjww-dev.libs"
 
