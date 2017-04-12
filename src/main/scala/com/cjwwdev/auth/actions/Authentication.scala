@@ -17,6 +17,7 @@ package com.cjwwdev.auth.actions
 
 import com.cjwwdev.auth.connectors.AuthConnector
 import com.cjwwdev.auth.models.AuthContext
+import com.cjwwdev.logging.Logger
 import play.api.mvc.{Request, Result}
 
 import scala.concurrent.Future
@@ -26,7 +27,7 @@ trait Authentication extends BaseAuth {
 
   val authConnector: AuthConnector
 
-  protected def authorised(userId: String)(f: AuthorisationResult => Future[Result])(implicit request: Request[_]): Future[Result] = {
+  protected def authenticated(userId: String)(f: AuthorisationResult => Future[Result])(implicit request: Request[_]): Future[Result] = {
     for {
       currentAuthority <- authConnector.getContext
       result <- f(mapToAuthResult(userId, currentAuthority))
@@ -38,8 +39,12 @@ trait Authentication extends BaseAuth {
   private def mapToAuthResult(userId: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
     checkAppId match {
       case Authorised => context match {
-        case Some(_) => Authorised
-        case None => NotAuthorised
+        case Some(_) =>
+          Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as $userId")
+          Authorised
+        case None =>
+          Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+          NotAuthorised
       }
       case NotAuthorised => NotAuthorised
     }

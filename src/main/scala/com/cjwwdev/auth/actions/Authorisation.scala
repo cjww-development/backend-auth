@@ -17,6 +17,7 @@ package com.cjwwdev.auth.actions
 
 import com.cjwwdev.auth.connectors.AuthConnector
 import com.cjwwdev.auth.models.AuthContext
+import com.cjwwdev.logging.Logger
 import play.api.mvc.{Request, Result}
 
 import scala.concurrent.Future
@@ -38,8 +39,17 @@ trait Authorisation extends BaseAuth {
   private def mapToAuthResult(userId: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
     checkAppId match {
       case Authorised => context match {
-        case Some(authority) => if(userId == authority.user.userId) Authorised else NotAuthorised
-        case None => NotAuthorised
+        case Some(authority) =>
+          if(userId == authority.user.userId){
+            Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as ${authority.user.userId}")
+            Authorised
+          } else {
+            Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+            NotAuthorised
+          }
+        case None =>
+          Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+          NotAuthorised
       }
       case NotAuthorised => NotAuthorised
     }
