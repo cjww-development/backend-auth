@@ -17,14 +17,17 @@ package com.cjwwdev.auth.connectors
 
 import com.cjwwdev.auth.models.{AuthContext, User}
 import com.cjwwdev.http.verbs.Http
+import com.cjwwdev.security.encryption.DataSecurity
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.mockito.Mockito.when
 import org.mockito.ArgumentMatchers
+import play.api.libs.ws.WSResponse
 import play.api.test.FakeRequest
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import play.api.test.Helpers.OK
 
 class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -42,20 +45,29 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     settingsUri = "/test/uri"
   )
 
+  def mockResponse: WSResponse = {
+    val m = mock[WSResponse]
+    when(m.status).thenReturn(OK)
+    when(m.body).thenReturn(DataSecurity.encryptData[AuthContext](testContext).get)
+    m
+  }
+
   class Setup {
     val testConnector = new AuthConnector(mockHttp)
   }
 
-  "getContext" ignore {
+  "getContext" should {
     "return an AuthContext" when {
       "given a request with a valid context id in the session" in new Setup {
-        implicit val request = FakeRequest().withSession("contextId" -> "testContextId")
+        implicit val request = FakeRequest().withHeaders("contextId" -> "testContextId")
 
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any()))
-          .thenReturn(Future.successful(testContext))
+        val testResponse = mockResponse
+
+        when(mockHttp.GET(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(testResponse))
 
         val result = Await.result(testConnector.getContext, 5.seconds)
-        result mustBe testContext
+        result mustBe Some(testContext)
       }
     }
   }

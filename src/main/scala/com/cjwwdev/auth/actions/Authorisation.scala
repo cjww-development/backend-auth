@@ -29,7 +29,7 @@ trait Authorisation extends BaseAuth {
   protected def authorised(userId: String)(f: AuthorisationResult => Future[Result])(implicit request: Request[_]): Future[Result] = {
     for {
       currentAuthority <- authConnector.getContext
-      result <- f(mapToAuthResult(userId, Some(currentAuthority)))
+      result <- f(mapToAuthResult(userId, currentAuthority))
     } yield {
       result
     }
