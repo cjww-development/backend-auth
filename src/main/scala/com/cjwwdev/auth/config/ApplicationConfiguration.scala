@@ -15,13 +15,9 @@
 // limitations under the License.
 package com.cjwwdev.auth.config
 
+import com.cjwwdev.bootstrap.config.BaseConfiguration
 import com.typesafe.config.ConfigFactory
 
-private[auth] trait ApplicationConfiguration {
-  val config                  = ConfigFactory.load
+trait ApplicationConfiguration extends BaseConfiguration {
   val authMicroservice        = config.getString("routes.auth-microservice")
-  val AUTH_MICROSERVICE_ID    = config.getString("application-ids.auth-microservice")
-  val AUTH_ID                 = config.getString("application-ids.auth-service")
-  val DIAG_ID                 = config.getString("application-ids.diagnostics-frontend")
-  val DEV_ID                  = config.getString("application-ids.deversity-frontend")
 }

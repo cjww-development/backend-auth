@@ -15,7 +15,7 @@
 // limitations under the License.
 package com.cjwwdev.auth.actions
 
-import com.cjwwdev.auth.config.ApplicationConfiguration
+import com.cjwwdev.bootstrap.config.BaseConfiguration
 import com.cjwwdev.logging.Logger
 import play.api.mvc.{Request, Result}
 
@@ -26,7 +26,7 @@ sealed trait AuthorisationResult
 case object Authorised extends AuthorisationResult
 case object NotAuthorised extends AuthorisationResult
 
-trait BaseAuth extends ApplicationConfiguration {
+trait BaseAuth extends BaseConfiguration {
 
   protected def openActionVerification(f: AuthorisationResult => Future[Result])(implicit request: Request[_]): Future[Result] = {
     f(checkAppId)
@@ -35,7 +35,7 @@ trait BaseAuth extends ApplicationConfiguration {
   private[actions] def checkAppId(implicit request: Request[_]) = {
     Try(request.headers("appId")) match {
       case Success(appId) => appId match {
-        case AUTH_MICROSERVICE_ID | AUTH_ID | DIAG_ID | DEV_ID => Authorised
+        case AUTH_SERVICE_ID | AUTH_MIRCOSERVICE_ID | ACCOUNTS_MIRCOSERVICE_ID | SESSION_STORE_ID => Authorised
         case _ =>
           Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
           NotAuthorised
