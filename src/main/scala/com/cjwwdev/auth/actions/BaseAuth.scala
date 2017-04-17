@@ -35,7 +35,7 @@ trait BaseAuth extends BaseConfiguration {
   private[actions] def checkAppId(implicit request: Request[_]) = {
     Try(request.headers("appId")) match {
       case Success(appId) => appId match {
-        case AUTH_SERVICE_ID | AUTH_MIRCOSERVICE_ID | ACCOUNTS_MIRCOSERVICE_ID | SESSION_STORE_ID => Authorised
+        case DEVERSITY_ID | DIAG_ID | HUB_ID | AUTH_SERVICE_ID | AUTH_MIRCOSERVICE_ID | ACCOUNTS_MIRCOSERVICE_ID | SESSION_STORE_ID => Authorised
         case _ =>
           Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
           NotAuthorised
