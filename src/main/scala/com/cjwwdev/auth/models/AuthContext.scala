@@ -17,7 +17,7 @@ package com.cjwwdev.auth.models
 
 import play.api.libs.json.Json
 
-case class AuthContext(_id : String,
+case class AuthContext(contextId : String,
                        user : User,
                        basicDetailsUri : String,
                        enrolmentsUri : String,

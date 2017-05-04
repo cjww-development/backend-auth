@@ -34,7 +34,7 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
   val mockHttp = mock[Http]
 
   val testContext = AuthContext(
-    _id = "testContextId",
+    contextId = "testContextId",
     user = User(
       userId = "testUserId",
       firstName = "testFirstName",

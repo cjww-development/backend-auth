@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 class AuthContextSpec extends PlaySpec {
 
   val testContext = AuthContext(
-    _id = "testContextId",
+    contextId = "testContextId",
     user = User(
       userId = "testUserId",
       firstName = "testFirstName",
@@ -35,7 +35,7 @@ class AuthContextSpec extends PlaySpec {
   val testJson = Json.parse(
     """
       |{
-      |   "_id":"testContextId",
+      |   "contextId":"testContextId",
       |   "user": {
       |     "userId":"testUserId",
       |     "firstName":"testFirstName",
