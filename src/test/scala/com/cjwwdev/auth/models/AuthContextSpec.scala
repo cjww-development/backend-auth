@@ -25,7 +25,9 @@ class AuthContextSpec extends PlaySpec {
     user = User(
       userId = "testUserId",
       firstName = "testFirstName",
-      lastName = "testLastName"
+      lastName = "testLastName",
+      credentialType = "testType",
+      role = Some("testRole")
     ),
     basicDetailsUri = "/test/uri",
     enrolmentsUri = "/test/uri",
@@ -39,7 +41,9 @@ class AuthContextSpec extends PlaySpec {
       |   "user": {
       |     "userId":"testUserId",
       |     "firstName":"testFirstName",
-      |     "lastName":"testLastName"
+      |     "lastName":"testLastName",
+      |     "credentialType":"testType",
+      |     "role":"testRole"
       |   },
       |   "basicDetailsUri":"/test/uri",
       |   "enrolmentsUri":"/test/uri",

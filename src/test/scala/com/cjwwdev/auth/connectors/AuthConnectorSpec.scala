@@ -38,7 +38,9 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     user = User(
       userId = "testUserId",
       firstName = "testFirstName",
-      lastName = "testLastName"
+      lastName = "testLastName",
+      credentialType = "testType",
+      role = Some("testRole")
     ),
     basicDetailsUri = "/test/uri",
     enrolmentsUri = "/test/uri",

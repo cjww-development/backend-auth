@@ -25,7 +25,9 @@ case class AuthContext(contextId : String,
 
 case class User(userId : String,
                 firstName : String,
-                lastName : String)
+                lastName : String,
+                credentialType: String,
+                role: Option[String])
 
 object AuthContext {
   implicit val formatUser = Json.format[User]
