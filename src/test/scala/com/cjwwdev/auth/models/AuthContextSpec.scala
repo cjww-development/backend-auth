@@ -24,8 +24,9 @@ class AuthContextSpec extends PlaySpec {
     contextId = "testContextId",
     user = User(
       userId = "testUserId",
-      firstName = "testFirstName",
-      lastName = "testLastName",
+      firstName = Some("testFirstName"),
+      lastName = Some("testLastName"),
+      orgName = None,
       credentialType = "testType",
       role = Some("testRole")
     ),

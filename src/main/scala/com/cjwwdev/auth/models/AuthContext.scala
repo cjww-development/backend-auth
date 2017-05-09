@@ -24,8 +24,9 @@ case class AuthContext(contextId : String,
                        settingsUri : String)
 
 case class User(userId : String,
-                firstName : String,
-                lastName : String,
+                firstName : Option[String],
+                lastName : Option[String],
+                orgName: Option[String],
                 credentialType: String,
                 role: Option[String])
 
