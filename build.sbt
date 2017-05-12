@@ -14,7 +14,7 @@ scalaVersion := "2.11.11"
 organization := "com.cjww-dev.libs"
 
 val cjwwDep: Seq[ModuleID] = Seq(
-  "com.cjww-dev.libs" %% "http-verbs" % "0.13.0",
+  "com.cjww-dev.libs" %% "http-verbs" % "0.14.0",
   "com.cjww-dev.libs" %% "logging" % "0.4.0",
   "com.cjww-dev.libs" %% "bootstrapper" % "1.1.0"
 )
