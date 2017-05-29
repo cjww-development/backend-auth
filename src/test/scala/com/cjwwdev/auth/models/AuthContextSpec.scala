@@ -54,7 +54,9 @@ class AuthContextSpec extends PlaySpec {
       |   "basicDetailsUri":"/test/uri",
       |   "enrolmentsUri":"/test/uri",
       |   "settingsUri":"/test/uri",
-      |   "$date" : ${now.getMillis}
+      |   "createdAt" : {
+      |     "$date" : ${now.getMillis}
+      |   }
       |}
     """.stripMargin
   )
