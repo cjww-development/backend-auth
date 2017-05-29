@@ -15,13 +15,10 @@
 // limitations under the License.
 package com.cjwwdev.auth.models
 
-import play.api.libs.json.Json
-
-case class AuthContext(contextId : String,
-                       user : User,
-                       basicDetailsUri : String,
-                       enrolmentsUri : String,
-                       settingsUri : String)
+import com.cjwwdev.json.JsonFormats
+import org.joda.time.DateTime
+import play.api.libs.json._
+import play.api.libs.functional.syntax._
 
 case class User(userId : String,
                 firstName : Option[String],
@@ -30,7 +27,31 @@ case class User(userId : String,
                 credentialType: String,
                 role: Option[String])
 
-object AuthContext {
-  implicit val formatUser = Json.format[User]
-  implicit val format = Json.format[AuthContext]
+object User extends JsonFormats[User] {
+  override implicit val standardFormat: OFormat[User] = (
+    (__ \ "userId").format[String] and
+    (__ \ "firstName").formatNullable[String] and
+    (__ \ "lastName").formatNullable[String] and
+    (__ \ "orgName").formatNullable[String] and
+    (__ \ "credentialType").format[String] and
+    (__ \ "role").formatNullable[String]
+  )(User.apply, unlift(User.unapply))
+}
+
+case class AuthContext(contextId : String,
+                       user : User,
+                       basicDetailsUri : String,
+                       enrolmentsUri : String,
+                       settingsUri : String,
+                       createdAt: DateTime)
+
+object AuthContext extends JsonFormats[AuthContext] {
+  override implicit val standardFormat: OFormat[AuthContext] = (
+    (__ \ "contextId").format[String] and
+    (__ \ "user").format[User](User.standardFormat) and
+    (__ \ "basicDetailsUri").format[String] and
+    (__ \ "enrolmentsUri").format[String] and
+    (__ \ "settingsUri").format[String] and
+    (__ \ "createdAt").format[DateTime](dateTimeRead)(dateTimeWrite)
+  )(AuthContext.apply, unlift(AuthContext.unapply))
 }

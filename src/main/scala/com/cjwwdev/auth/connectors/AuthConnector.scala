@@ -33,7 +33,7 @@ class AuthConnector @Inject()(http: Http) extends ApplicationConfiguration with 
   def getContext(implicit request: Request[_]): Future[Option[AuthContext]] = {
     http.GET(s"$authMicroservice/get-context/${request.headers("contextId")}") map { resp =>
       resp.status match {
-        case OK => DataSecurity.decryptInto[AuthContext](resp.body)
+        case OK => DataSecurity.decryptIntoType[AuthContext](resp.body)
         case _ => None
       }
     }

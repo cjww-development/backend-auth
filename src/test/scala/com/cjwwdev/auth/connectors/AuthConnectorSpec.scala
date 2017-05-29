@@ -18,6 +18,7 @@ package com.cjwwdev.auth.connectors
 import com.cjwwdev.auth.models.{AuthContext, User}
 import com.cjwwdev.http.verbs.Http
 import com.cjwwdev.security.encryption.DataSecurity
+import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import org.mockito.Mockito.when
@@ -33,6 +34,8 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
   val mockHttp = mock[Http]
 
+  final val now = new DateTime(DateTimeZone.UTC)
+
   val testContext = AuthContext(
     contextId = "testContextId",
     user = User(
@@ -45,13 +48,14 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     ),
     basicDetailsUri = "/test/uri",
     enrolmentsUri = "/test/uri",
-    settingsUri = "/test/uri"
+    settingsUri = "/test/uri",
+    now
   )
 
   def mockResponse: WSResponse = {
     val m = mock[WSResponse]
     when(m.status).thenReturn(OK)
-    when(m.body).thenReturn(DataSecurity.encryptData[AuthContext](testContext).get)
+    when(m.body).thenReturn(DataSecurity.encryptType[AuthContext](testContext).get)
     m
   }
 

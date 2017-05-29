@@ -15,10 +15,14 @@
 // limitations under the License.
 package com.cjwwdev.auth.models
 
+import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
 class AuthContextSpec extends PlaySpec {
+
+  val date = "$date"
+  val now = new DateTime(DateTimeZone.UTC)
 
   val testContext = AuthContext(
     contextId = "testContextId",
@@ -32,11 +36,12 @@ class AuthContextSpec extends PlaySpec {
     ),
     basicDetailsUri = "/test/uri",
     enrolmentsUri = "/test/uri",
-    settingsUri = "/test/uri"
+    settingsUri = "/test/uri",
+    now
   )
 
   val testJson = Json.parse(
-    """
+    s"""
       |{
       |   "contextId":"testContextId",
       |   "user": {
@@ -48,7 +53,8 @@ class AuthContextSpec extends PlaySpec {
       |   },
       |   "basicDetailsUri":"/test/uri",
       |   "enrolmentsUri":"/test/uri",
-      |   "settingsUri":"/test/uri"
+      |   "settingsUri":"/test/uri",
+      |   "$date" : ${now.getMillis}
       |}
     """.stripMargin
   )
