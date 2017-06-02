@@ -16,6 +16,7 @@
 package com.cjwwdev.auth.connectors
 
 import com.cjwwdev.auth.models.{AuthContext, User}
+import com.cjwwdev.http.exceptions.NotFoundException
 import com.cjwwdev.http.verbs.Http
 import com.cjwwdev.security.encryption.DataSecurity
 import org.joda.time.{DateTime, DateTimeZone}
@@ -70,11 +71,25 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
         val testResponse = mockResponse
 
-        when(mockHttp.GET(ArgumentMatchers.any())(ArgumentMatchers.any()))
-          .thenReturn(Future.successful(testResponse))
+        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.successful(testContext))
 
         val result = Await.result(testConnector.getContext, 5.seconds)
         result mustBe Some(testContext)
+      }
+    }
+
+    "return none" when {
+      "no auth context was found" in new Setup {
+        implicit val request = FakeRequest().withHeaders("contextId" -> "testContextId")
+
+        val testResponse = mockResponse
+
+        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+          .thenReturn(Future.failed(new NotFoundException("test message")))
+
+        val result = Await.result(testConnector.getContext, 5.seconds)
+        result mustBe None
       }
     }
   }
