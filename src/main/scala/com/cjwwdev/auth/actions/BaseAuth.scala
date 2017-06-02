@@ -42,7 +42,6 @@ trait BaseAuth extends BaseConfiguration {
       }
       case Failure(_) =>
         Logger.error("[BackendController] - [checkAuth] : AppId not found in header")
-        Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
         NotAuthorised
     }
   }
