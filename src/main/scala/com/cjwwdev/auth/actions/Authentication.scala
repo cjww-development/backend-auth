@@ -28,13 +28,12 @@ trait Authentication extends BaseAuth {
 
   val authConnector: AuthConnector
 
-  protected def authenticated(userId: String)(f: => Result)(implicit request: Request[_]): Future[Result] = {
-    for {
-      context <- authConnector.getContext
-      result  = mapToAuthResult(userId, context)
-    } yield result match {
-      case Authorised     => f
-      case NotAuthorised  => Forbidden
+  protected def authenticated(userId: String)(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
+    authConnector.getContext flatMap { context =>
+      mapToAuthResult(userId, context) match {
+        case Authorised     => f
+        case NotAuthorised  => Future.successful(Forbidden)
+      }
     }
   }
 
