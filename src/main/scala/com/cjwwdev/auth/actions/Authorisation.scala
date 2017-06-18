@@ -19,6 +19,7 @@ import com.cjwwdev.auth.connectors.AuthConnector
 import com.cjwwdev.auth.models.AuthContext
 import com.cjwwdev.logging.Logger
 import play.api.mvc.{Request, Result}
+import play.api.mvc.Results.Forbidden
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,12 +28,13 @@ trait Authorisation extends BaseAuth {
 
   val authConnector: AuthConnector
 
-  protected def authorised(userId: String)(f: AuthorisationResult => Future[Result])(implicit request: Request[_]): Future[Result] = {
+  protected def authorised(userId: String)(f: => Result)(implicit request: Request[_]): Future[Result] = {
     for {
-      currentAuthority <- authConnector.getContext
-      result <- f(mapToAuthResult(userId, currentAuthority))
-    } yield {
-      result
+      context <- authConnector.getContext
+      result  = mapToAuthResult(userId, context)
+    } yield result match {
+      case Authorised    => f
+      case NotAuthorised => Forbidden
     }
   }
 

@@ -18,6 +18,7 @@ package com.cjwwdev.auth.actions
 import com.cjwwdev.bootstrap.config.BaseConfiguration
 import com.cjwwdev.logging.Logger
 import play.api.mvc.{Request, Result}
+import play.api.mvc.Results.Forbidden
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
@@ -27,12 +28,14 @@ case object Authorised extends AuthorisationResult
 case object NotAuthorised extends AuthorisationResult
 
 trait BaseAuth extends BaseConfiguration {
-
-  protected def openActionVerification(f: AuthorisationResult => Future[Result])(implicit request: Request[_]): Future[Result] = {
-    f(checkAppId)
+  protected def openActionVerification(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
+    checkAppId match {
+      case Authorised     => f
+      case NotAuthorised  => Future.successful(Forbidden)
+    }
   }
 
-  private[actions] def checkAppId(implicit request: Request[_]) = {
+  private[actions] def checkAppId(implicit request: Request[_]): AuthorisationResult = {
     Try(request.headers("appId")) match {
       case Success(appId) => appId match {
         case DEVERSITY_ID | DIAG_ID | HUB_ID | AUTH_SERVICE_ID | AUTH_MIRCOSERVICE_ID | ACCOUNTS_MIRCOSERVICE_ID | SESSION_STORE_ID => Authorised
