@@ -56,7 +56,7 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
   def mockResponse: WSResponse = {
     val m = mock[WSResponse]
     when(m.status).thenReturn(OK)
-    when(m.body).thenReturn(DataSecurity.encryptType[AuthContext](testContext).get)
+    when(m.body).thenReturn(DataSecurity.encryptType[AuthContext](testContext))
     m
   }
 

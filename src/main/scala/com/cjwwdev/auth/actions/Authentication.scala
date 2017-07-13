@@ -17,7 +17,7 @@ package com.cjwwdev.auth.actions
 
 import com.cjwwdev.auth.connectors.AuthConnector
 import com.cjwwdev.auth.models.AuthContext
-import com.cjwwdev.logging.Logger
+import play.api.Logger
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.Forbidden
 
