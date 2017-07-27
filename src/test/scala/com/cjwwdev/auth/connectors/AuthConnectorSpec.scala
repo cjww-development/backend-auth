@@ -29,7 +29,7 @@ import play.api.test.FakeRequest
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
-import play.api.test.Helpers.OK
+import play.api.test.Helpers.{OK, NOT_FOUND}
 
 class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -53,10 +53,16 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     now
   )
 
-  def mockResponse: WSResponse = {
+  val mockResponse: WSResponse = {
     val m = mock[WSResponse]
     when(m.status).thenReturn(OK)
     when(m.body).thenReturn(DataSecurity.encryptType[AuthContext](testContext))
+    m
+  }
+
+  val mockFailedResponse = {
+    val m = mock[WSResponse]
+    when(m.status).thenReturn(NOT_FOUND)
     m
   }
 
@@ -71,8 +77,8 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
         val testResponse = mockResponse
 
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(testContext))
+        when(mockHttp.GET(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(mockResponse))
 
         val result = Await.result(testConnector.getContext, 5.seconds)
         result mustBe Some(testContext)
@@ -85,8 +91,8 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
         val testResponse = mockResponse
 
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.failed(new NotFoundException("test message")))
+        when(mockHttp.GET(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(mockFailedResponse))
 
         val result = Await.result(testConnector.getContext, 5.seconds)
         result mustBe None
