@@ -15,7 +15,8 @@
 // limitations under the License.
 package com.cjwwdev.auth.actions
 
-import com.cjwwdev.config.BaseConfiguration
+import com.cjwwdev.auth.models.AuthContext
+import com.cjwwdev.config.ConfigurationLoader
 import play.api.Logger
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.Forbidden
@@ -24,21 +25,32 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 sealed trait AuthorisationResult
-case object Authorised extends AuthorisationResult
+case class Authorised(authContext: AuthContext) extends AuthorisationResult
+case object Authenticated extends AuthorisationResult
 case object NotAuthorised extends AuthorisationResult
 
-trait BaseAuth extends BaseConfiguration {
+trait BaseAuth {
+  val config: ConfigurationLoader
+
+  private val DEVERSITY_ID             = config.getApplicationId("deversity-frontend")
+  private val DIAG_ID                  = config.getApplicationId("diagnostics-frontend")
+  private val HUB_ID                   = config.getApplicationId("hub-frontend")
+  private val AUTH_SERVICE_ID          = config.getApplicationId("auth-service")
+  private val AUTH_MICROSERVICE_ID     = config.getApplicationId("auth-microservice")
+  private val ACCOUNTS_MICROSERVICE_ID = config.getApplicationId("accounts-microservice")
+  private val SESSION_STORE_ID         = config.getApplicationId("session-store")
+
   protected def openActionVerification(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
     checkAppId match {
-      case Authorised     => f
-      case NotAuthorised  => Future.successful(Forbidden)
+      case Authenticated  => f
+      case _              => Future.successful(Forbidden)
     }
   }
 
   private[actions] def checkAppId(implicit request: Request[_]): AuthorisationResult = {
     Try(request.headers("appId")) match {
       case Success(appId) => appId match {
-        case DEVERSITY_ID | DIAG_ID | HUB_ID | AUTH_SERVICE_ID | AUTH_MICROSERVICE_ID | ACCOUNTS_MICROSERVICE_ID | SESSION_STORE_ID => Authorised
+        case DEVERSITY_ID | DIAG_ID | HUB_ID | AUTH_SERVICE_ID | AUTH_MICROSERVICE_ID | ACCOUNTS_MICROSERVICE_ID | SESSION_STORE_ID => Authenticated
         case _ =>
           Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
           NotAuthorised

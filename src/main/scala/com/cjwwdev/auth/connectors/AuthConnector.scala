@@ -17,18 +17,20 @@ package com.cjwwdev.auth.connectors
 
 import javax.inject.{Inject, Singleton}
 
-import com.cjwwdev.auth.config.ApplicationConfiguration
 import com.cjwwdev.auth.models.AuthContext
 import com.cjwwdev.http.exceptions.NotFoundException
 import com.cjwwdev.http.utils.SessionUtils
 import com.cjwwdev.http.verbs.Http
+import com.typesafe.config.ConfigFactory
 import play.api.mvc.Request
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class AuthConnector @Inject()(http: Http) extends ApplicationConfiguration with SessionUtils {
+class AuthConnector @Inject()(http: Http) extends SessionUtils {
+  val authMicroservice = ConfigFactory.load.getString("microservice.external-services.auth-microservice.domain")
+
   def getContext(implicit request: Request[_]): Future[Option[AuthContext]] = {
     http.GET[AuthContext](s"$authMicroservice/get-context/${request.headers("contextId")}") map {
       context => Some(context)

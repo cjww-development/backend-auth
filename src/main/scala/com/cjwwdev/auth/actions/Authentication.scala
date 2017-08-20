@@ -31,23 +31,23 @@ trait Authentication extends BaseAuth {
   protected def authenticated(userId: String)(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
     authConnector.getContext flatMap { context =>
       mapToAuthResult(userId, context) match {
-        case Authorised     => f
-        case NotAuthorised  => Future.successful(Forbidden)
+        case Authenticated  => f
+        case _              => Future.successful(Forbidden)
       }
     }
   }
 
   private def mapToAuthResult(userId: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
     checkAppId match {
-      case Authorised => context match {
+      case Authenticated => context match {
         case Some(_) =>
           Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as $userId")
-          Authorised
+          Authenticated
         case None =>
           Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
           NotAuthorised
       }
-      case NotAuthorised => NotAuthorised
+      case _ => NotAuthorised
     }
   }
 }
