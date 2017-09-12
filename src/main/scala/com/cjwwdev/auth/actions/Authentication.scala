@@ -28,20 +28,20 @@ trait Authentication extends BaseAuth {
 
   val authConnector: AuthConnector
 
-  protected def authenticated(userId: String)(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
+  protected def authenticated(id: String)(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
     authConnector.getContext flatMap { context =>
-      mapToAuthResult(userId, context) match {
+      mapToAuthResult(id, context) match {
         case Authenticated  => f
         case _              => Future.successful(Forbidden)
       }
     }
   }
 
-  private def mapToAuthResult(userId: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
+  private def mapToAuthResult(id: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
     checkAppId match {
       case Authenticated => context match {
         case Some(_) =>
-          Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as $userId")
+          Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as $id")
           Authenticated
         case None =>
           Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")

@@ -21,7 +21,7 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-case class User(userId : String,
+case class User(id : String,
                 firstName : Option[String],
                 lastName : Option[String],
                 orgName: Option[String],
@@ -30,7 +30,7 @@ case class User(userId : String,
 
 object User extends JsonFormats[User] {
   val reads: Reads[User] = (
-    (__ \ "userId").read[String] and
+    (__ \ "id").read[String] and
     (__ \ "firstName").readNullable[String] and
     (__ \ "lastName").readNullable[String] and
     (__ \ "orgName").readNullable[String] and
@@ -43,7 +43,7 @@ object User extends JsonFormats[User] {
   )
 
   val writes: OWrites[User] = (
-    (__ \ "userId").write[String] and
+    (__ \ "id").write[String] and
     (__ \ "firstName").writeNullable[String] and
     (__ \ "lastName").writeNullable[String] and
     (__ \ "orgName").writeNullable[String] and

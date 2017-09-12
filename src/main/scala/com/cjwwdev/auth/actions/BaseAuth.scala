@@ -32,13 +32,16 @@ case object NotAuthorised extends AuthorisationResult
 trait BaseAuth {
   val config: ConfigurationLoader
 
-  private val DEVERSITY_ID             = config.getApplicationId("deversity-frontend")
+  private val DEVERSITY_FE_ID          = config.getApplicationId("deversity-frontend")
+  private val DEVERSITY_ID             = config.getApplicationId("deversity")
   private val DIAG_ID                  = config.getApplicationId("diagnostics-frontend")
   private val HUB_ID                   = config.getApplicationId("hub-frontend")
   private val AUTH_SERVICE_ID          = config.getApplicationId("auth-service")
   private val AUTH_MICROSERVICE_ID     = config.getApplicationId("auth-microservice")
   private val ACCOUNTS_MICROSERVICE_ID = config.getApplicationId("accounts-microservice")
   private val SESSION_STORE_ID         = config.getApplicationId("session-store")
+
+  private val idSet = List(DEVERSITY_FE_ID, DEVERSITY_ID, DIAG_ID, HUB_ID, AUTH_SERVICE_ID, AUTH_MICROSERVICE_ID, ACCOUNTS_MICROSERVICE_ID, SESSION_STORE_ID)
 
   protected def openActionVerification(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
     checkAppId match {
@@ -47,13 +50,13 @@ trait BaseAuth {
     }
   }
 
-  private[actions] def checkAppId(implicit request: Request[_]): AuthorisationResult = {
+  protected def checkAppId(implicit request: Request[_]): AuthorisationResult = {
     Try(request.headers("appId")) match {
-      case Success(appId) => appId match {
-        case DEVERSITY_ID | DIAG_ID | HUB_ID | AUTH_SERVICE_ID | AUTH_MICROSERVICE_ID | ACCOUNTS_MICROSERVICE_ID | SESSION_STORE_ID => Authenticated
-        case _ =>
-          Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
-          NotAuthorised
+      case Success(appId) => if(idSet.contains(appId)) {
+        Authenticated
+      }  else {
+        Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
+        NotAuthorised
       }
       case Failure(_) =>
         Logger.error("[BackendController] - [checkAuth] : AppId not found in header")

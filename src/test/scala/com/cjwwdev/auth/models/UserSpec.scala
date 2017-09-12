@@ -31,7 +31,7 @@ class UserSpec extends PlaySpec with JsonValidation {
     "successfully read into json" when {
       "the credential type is individual" in {
         val expectedModel = User(
-          userId         = s"user-$uuid",
+          id             = s"user-$uuid",
           firstName      = Some("testFirstName"),
           lastName       = Some("testLastName"),
           orgName        = None,
@@ -42,7 +42,7 @@ class UserSpec extends PlaySpec with JsonValidation {
         val inputJson = Json.parse(
           s"""
             |{
-            | "userId" : "user-$uuid",
+            | "id" : "user-$uuid",
             | "firstName" : "testFirstName",
             | "lastName" : "testLastName",
             | "credentialType" : "individual"
@@ -55,7 +55,7 @@ class UserSpec extends PlaySpec with JsonValidation {
 
       "the credential type is organisation" in {
         val expectedModel = User(
-          userId         = s"user-$uuid",
+          id             = s"user-$uuid",
           firstName      = None,
           lastName       = None,
           orgName        = Some("testOrgName"),
@@ -66,7 +66,7 @@ class UserSpec extends PlaySpec with JsonValidation {
         val inputJson = Json.parse(
           s"""
              |{
-             | "userId" : "user-$uuid",
+             | "id" : "user-$uuid",
              | "orgName" : "testOrgName",
              | "credentialType" : "organisation"
              |}
@@ -82,7 +82,7 @@ class UserSpec extends PlaySpec with JsonValidation {
         val inputJson = Json.parse(
           s"""
              |{
-             | "userId" : "user-$uuid",
+             | "id" : "user-$uuid",
              | "credentialType" : "individual"
              |}
           """.stripMargin
@@ -101,7 +101,7 @@ class UserSpec extends PlaySpec with JsonValidation {
         val inputJson = Json.parse(
           s"""
              |{
-             | "userId" : "user-$uuid",
+             | "id" : "user-$uuid",
              | "orgName" : "testOrgName",
              | "credentialType" : "individual"
              |}
@@ -121,7 +121,7 @@ class UserSpec extends PlaySpec with JsonValidation {
         val inputJson = Json.parse(
           s"""
              |{
-             | "userId" : "user-$uuid",
+             | "id" : "user-$uuid",
              | "firstName" : "testFirstName",
              | "lastName" : "testLastName",
              | "credentialType" : "organisation"
@@ -142,7 +142,7 @@ class UserSpec extends PlaySpec with JsonValidation {
         val inputJson = Json.parse(
           s"""
              |{
-             | "userId" : "user-$uuid",
+             | "id" : "user-$uuid",
              | "credentialType" : "organisation"
              |}
           """.stripMargin

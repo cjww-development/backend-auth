@@ -27,7 +27,7 @@ class AuthContextSpec extends PlaySpec {
   val testContext = AuthContext(
     contextId = "testContextId",
     user = User(
-      userId = "testUserId",
+      id = "testUserId",
       firstName = Some("testFirstName"),
       lastName = Some("testLastName"),
       orgName = None,
@@ -45,7 +45,7 @@ class AuthContextSpec extends PlaySpec {
       |{
       |   "contextId":"testContextId",
       |   "user": {
-      |     "userId":"testUserId",
+      |     "id":"testUserId",
       |     "firstName":"testFirstName",
       |     "lastName":"testLastName",
       |     "credentialType":"testType",

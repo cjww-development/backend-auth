@@ -28,26 +28,25 @@ trait Authorisation extends BaseAuth {
 
   val authConnector: AuthConnector
 
-  protected def authorised(userId: String)(f: AuthContext => Future[Result])(implicit request: Request[_]): Future[Result] = {
+  protected def authorised(id: String)(f: AuthContext => Future[Result])(implicit request: Request[_]): Future[Result] = {
     authConnector.getContext flatMap { context =>
-      mapToAuthResult(userId, context) match {
+      mapToAuthResult(id, context) match {
         case Authorised(ac) => f(ac)
         case _              => Future.successful(Forbidden)
       }
     }
   }
 
-  private def mapToAuthResult(userId: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
+  private def mapToAuthResult(id: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
     checkAppId match {
       case Authenticated => context match {
-        case Some(authority) =>
-          if(userId == authority.user.userId){
-            Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as ${authority.user.userId}")
-            Authorised(authority)
-          } else {
-            Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
-            NotAuthorised
-          }
+        case Some(authority) => if(id == authority.user.id) {
+          Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as ${authority.user.id}")
+          Authorised(authority)
+        } else {
+          Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+          NotAuthorised
+        }
         case None =>
           Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
           NotAuthorised
