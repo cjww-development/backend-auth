@@ -17,7 +17,7 @@ package com.cjwwdev.auth.actions
 
 import com.cjwwdev.auth.connectors.AuthConnector
 import com.cjwwdev.auth.models.AuthContext
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.Forbidden
 
@@ -27,6 +27,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 trait Authorisation extends BaseAuth {
 
   val authConnector: AuthConnector
+
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
 
   protected def authorised(id: String)(f: AuthContext => Future[Result])(implicit request: Request[_]): Future[Result] = {
     authConnector.getContext flatMap { context =>
@@ -41,14 +43,14 @@ trait Authorisation extends BaseAuth {
     checkAppId match {
       case Authenticated => context match {
         case Some(authority) => if(id == authority.user.id) {
-          Logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as ${authority.user.id}")
+          logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as ${authority.user.id}")
           Authorised(authority)
         } else {
-          Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+          logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
           NotAuthorised
         }
         case None =>
-          Logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+          logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
           NotAuthorised
       }
       case _ => NotAuthorised

@@ -17,7 +17,7 @@ package com.cjwwdev.auth.actions
 
 import com.cjwwdev.auth.models.AuthContext
 import com.cjwwdev.config.ConfigurationLoader
-import play.api.Logger
+import org.slf4j.{Logger, LoggerFactory}
 import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.Forbidden
 
@@ -43,6 +43,8 @@ trait BaseAuth {
 
   private val idSet = List(DEVERSITY_FE_ID, DEVERSITY_ID, DIAG_ID, HUB_ID, AUTH_SERVICE_ID, AUTH_MICROSERVICE_ID, ACCOUNTS_MICROSERVICE_ID, SESSION_STORE_ID)
 
+  private val logger: Logger = LoggerFactory.getLogger(getClass)
+
   protected def openActionVerification(f: => Future[Result])(implicit request: Request[_]): Future[Result] = {
     checkAppId match {
       case Authenticated  => f
@@ -55,11 +57,11 @@ trait BaseAuth {
       case Success(appId) => if(idSet.contains(appId)) {
         Authenticated
       }  else {
-        Logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
+        logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
         NotAuthorised
       }
       case Failure(_) =>
-        Logger.error("[BackendController] - [checkAuth] : AppId not found in header")
+        logger.error("[BackendController] - [checkAuth] : AppId not found in header")
         NotAuthorised
     }
   }
