@@ -15,27 +15,18 @@
 // limitations under the License.
 package com.cjwwdev.auth.connectors
 
+import com.cjwwdev.auth.helpers.WireMockHelper
 import com.cjwwdev.auth.models.{AuthContext, User}
-import com.cjwwdev.config.ConfigurationLoader
-import com.cjwwdev.http.exceptions.NotFoundException
-import com.cjwwdev.http.verbs.Http
 import com.cjwwdev.security.encryption.DataSecurity
 import org.joda.time.{DateTime, DateTimeZone}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import org.mockito.Mockito.when
-import org.mockito.ArgumentMatchers
-import play.api.libs.ws.WSResponse
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import play.api.test.Helpers.OK
 
-class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
-
-  val mockHttp    = mock[Http]
-  val mockConfig  = mock[ConfigurationLoader]
+class AuthConnectorSpec extends WireMockHelper {
 
   final val now = new DateTime(DateTimeZone.UTC)
 
@@ -55,40 +46,29 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
     now
   )
 
-  def mockResponse: WSResponse = {
-    val m = mock[WSResponse]
-    when(m.status).thenReturn(OK)
-    when(m.body).thenReturn(DataSecurity.encryptType[AuthContext](testContext))
-    m
-  }
-
-  class Setup {
-    val testConnector = new AuthConnector(mockHttp, mockConfig)
-  }
+  val testConnector = app.injector.instanceOf(classOf[AuthConnector])
 
   "getContext" should {
     "return an AuthContext" when {
-      "given a request with a valid context id in the session" in new Setup {
-        implicit val request = FakeRequest().withHeaders("contextId" -> "testContextId")
+      "given a request with a valid context id in the session" in {
+        implicit val request: FakeRequest[_] = FakeRequest().withHeaders("cookieId" -> "testCookieId")
 
-        val testResponse = mockResponse
+        wmGet("/session-store/session/invalid-cookie/context", OK, DataSecurity.encryptType[JsValue](Json.parse("""{"contextId"  : "testContextId"}""")))
 
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(testContext))
+        wmGet("/auth/get-context/testContextId", OK, DataSecurity.encryptType[AuthContext](testContext))
 
-        val result = Await.result(testConnector.getContext, 5.seconds)
+        val result = Await.result(testConnector.getContext(request), 5.seconds)
         result mustBe Some(testContext)
       }
     }
 
     "return none" when {
-      "no auth context was found" in new Setup {
-        implicit val request = FakeRequest().withHeaders("contextId" -> "testContextId")
+      "no auth context was found" in {
+        implicit val request: FakeRequest[_] = FakeRequest().withHeaders("cookieId" -> "testCookieId")
 
-        val testResponse = mockResponse
+        wmGet("/session-store/session/invalid-cookie/context", OK, DataSecurity.encryptType[JsValue](Json.parse("""{"contextId"  : "testContextId"}""")))
 
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.failed(new NotFoundException("test message")))
+        wmGet("/auth/get-context/testContextId", NOT_FOUND, "")
 
         val result = Await.result(testConnector.getContext, 5.seconds)
         result mustBe None

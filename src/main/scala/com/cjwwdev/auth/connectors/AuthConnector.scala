@@ -21,20 +21,27 @@ import com.cjwwdev.auth.models.AuthContext
 import com.cjwwdev.config.ConfigurationLoader
 import com.cjwwdev.http.exceptions.NotFoundException
 import com.cjwwdev.http.verbs.Http
+import com.cjwwdev.http.utils.SessionUtils
+import play.api.libs.json.JsValue
 import play.api.mvc.Request
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class AuthConnector @Inject()(http: Http, config: ConfigurationLoader) {
+class AuthConnector @Inject()(http: Http, config: ConfigurationLoader) extends SessionUtils {
   private val authMicroservice = config.buildServiceUrl("auth-microservice")
+  private val sessionStore     = config.buildServiceUrl("session-store")
 
   def getContext(implicit request: Request[_]): Future[Option[AuthContext]] = {
-    http.GET[AuthContext](s"$authMicroservice/get-context/${request.headers("contextId")}") map {
-      context => Some(context)
-    } recover {
-      case _: NotFoundException => None
+    http.GET[JsValue](s"$sessionStore/session/$getCookieId/context") flatMap { response =>
+      val contextId = response.\("contextId").as[String]
+
+      http.GET[AuthContext](s"$authMicroservice/get-context/$contextId") map {
+        context => Some(context)
+      } recover {
+        case _: NotFoundException => None
+      }
     }
   }
 }

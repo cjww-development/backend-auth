@@ -57,11 +57,11 @@ trait BaseAuth {
       case Success(appId) => if(idSet.contains(appId)) {
         Authenticated
       }  else {
-        logger.warn("[BackendController] - [checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
+        logger.warn("[checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
         NotAuthorised
       }
       case Failure(_) =>
-        logger.error("[BackendController] - [checkAuth] : AppId not found in header")
+        logger.error("[checkAuth] : AppId not found in header")
         NotAuthorised
     }
   }
