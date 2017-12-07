@@ -32,14 +32,14 @@ case object NotAuthorised extends AuthorisationResult
 trait BaseAuth {
   val config: ConfigurationLoader
 
-  private val DEVERSITY_FE_ID          = config.getApplicationId("deversity-frontend")
-  private val DEVERSITY_ID             = config.getApplicationId("deversity")
-  private val DIAG_ID                  = config.getApplicationId("diagnostics-frontend")
-  private val HUB_ID                   = config.getApplicationId("hub-frontend")
-  private val AUTH_SERVICE_ID          = config.getApplicationId("auth-service")
-  private val AUTH_MICROSERVICE_ID     = config.getApplicationId("auth-microservice")
-  private val ACCOUNTS_MICROSERVICE_ID = config.getApplicationId("accounts-microservice")
-  private val SESSION_STORE_ID         = config.getApplicationId("session-store")
+  val DEVERSITY_FE_ID          = config.getApplicationId("deversity-frontend")
+  val DEVERSITY_ID             = config.getApplicationId("deversity")
+  val DIAG_ID                  = config.getApplicationId("diagnostics-frontend")
+  val HUB_ID                   = config.getApplicationId("hub-frontend")
+  val AUTH_SERVICE_ID          = config.getApplicationId("auth-service")
+  val AUTH_MICROSERVICE_ID     = config.getApplicationId("auth-microservice")
+  val ACCOUNTS_MICROSERVICE_ID = config.getApplicationId("accounts-microservice")
+  val SESSION_STORE_ID         = config.getApplicationId("session-store")
 
   private val idSet = List(DEVERSITY_FE_ID, DEVERSITY_ID, DIAG_ID, HUB_ID, AUTH_SERVICE_ID, AUTH_MICROSERVICE_ID, ACCOUNTS_MICROSERVICE_ID, SESSION_STORE_ID)
 
@@ -53,16 +53,13 @@ trait BaseAuth {
   }
 
   protected def checkAppId(implicit request: Request[_]): AuthorisationResult = {
-    Try(request.headers("appId")) match {
-      case Success(appId) => if(idSet.contains(appId)) {
-        Authenticated
-      }  else {
-        logger.warn("[checkAuth] : API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
-        NotAuthorised
-      }
-      case Failure(_) =>
-        logger.error("[checkAuth] : AppId not found in header")
-        NotAuthorised
-    }
+    request.headers.get("appId").fold(notAuthorised("AppId not found in header"))(
+      appId => if(idSet.contains(appId)) Authenticated else notAuthorised("API CALL FROM UNKNOWN SOURCE - ACTION DENIED")
+    )
+  }
+
+  private def notAuthorised(msg: String): AuthorisationResult = {
+    logger.error(s"[checkAuth] - $msg")
+    NotAuthorised
   }
 }

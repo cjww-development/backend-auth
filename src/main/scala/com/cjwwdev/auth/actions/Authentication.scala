@@ -41,15 +41,18 @@ trait Authentication extends BaseAuth {
 
   private def mapToAuthResult(id: String, context: Option[AuthContext])(implicit request: Request[_]): AuthorisationResult = {
     checkAppId match {
-      case Authenticated => context match {
-        case Some(_) =>
-          logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as $id")
-          Authenticated
-        case None =>
-          logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
-          NotAuthorised
-      }
-      case _ => NotAuthorised
+      case Authenticated => context.fold(notAuthorised)(ac => authorised(ac.user.id))
+      case _             => NotAuthorised
     }
+  }
+
+  private def authorised(id: String): AuthorisationResult = {
+    logger.info(s"[Authorisation] - [mapToAuthResult]: User authorised as $id")
+    Authenticated
+  }
+
+  private def notAuthorised: AuthorisationResult = {
+    logger.warn("[Authorisation] - [mapToAuthResult]: User not authorised action deemed forbidden")
+    NotAuthorised
   }
 }

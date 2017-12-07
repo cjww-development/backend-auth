@@ -17,9 +17,12 @@ package com.cjwwdev.auth.connectors
 
 import com.cjwwdev.auth.helpers.WireMockHelper
 import com.cjwwdev.auth.models.{AuthContext, User}
+import com.cjwwdev.config.ConfigurationLoaderImpl
+import com.cjwwdev.http.verbs.HttpImpl
 import com.cjwwdev.security.encryption.DataSecurity
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json.{JsValue, Json}
+import play.api.libs.ws.WSClient
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
@@ -46,7 +49,11 @@ class AuthConnectorSpec extends WireMockHelper {
     now
   )
 
-  val testConnector = app.injector.instanceOf(classOf[AuthConnector])
+  val config   = app.injector.instanceOf(classOf[ConfigurationLoaderImpl])
+  val wsClient = app.injector.instanceOf(classOf[WSClient])
+  val http     = new HttpImpl(wsClient, config)
+
+  val testConnector = new AuthConnectorImpl(http, config)
 
   "getContext" should {
     "return an AuthContext" when {

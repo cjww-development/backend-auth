@@ -12,17 +12,13 @@ val libraryName = "backend-auth"
 
 lazy val library = Project(libraryName, file("."))
   .settings(
-      version                              :=  btVersion,
-      scalaVersion                         :=  "2.11.11",
-      organization                         :=  "com.cjww-dev.libs",
-      libraryDependencies                  ++= LibraryDependencies(),
-      bintrayOrganization                  :=  Some("cjww-development"),
-      bintrayReleaseOnPublish in ThisBuild :=  true,
-      bintrayRepository                    :=  "releases",
-      bintrayOmitLicense                   :=  true,
-      resolvers                            +=  "cjww-dev" at "http://dl.bintray.com/cjww-development/releases"
+    version                              :=  btVersion,
+    scalaVersion                         :=  "2.11.11",
+    organization                         :=  "com.cjww-dev.libs",
+    libraryDependencies                  ++= LibraryDependencies(),
+    bintrayOrganization                  :=  Some("cjww-development"),
+    bintrayReleaseOnPublish in ThisBuild :=  true,
+    bintrayRepository                    :=  "releases",
+    bintrayOmitLicense                   :=  true,
+    resolvers                            +=  "cjww-dev" at "http://dl.bintray.com/cjww-development/releases"
   )
-
-
-
-

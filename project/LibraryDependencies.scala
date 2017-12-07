@@ -26,8 +26,8 @@ private object CompileDependencies {
   private val playVersion      = "2.5.16"
 
   private val compileDependencies: Seq[ModuleID] = Seq(
-    "com.cjww-dev.libs" %% "http-verbs"            % "2.6.0",
-    "com.cjww-dev.libs" %% "application-utilities" % "2.6.0",
+    "com.cjww-dev.libs" %% "http-verbs"            % "2.9.0",
+    "com.cjww-dev.libs" %% "application-utilities" % "2.8.0",
     "com.typesafe.play" %  "play_2.11"             % "2.5.16"
   )
 
