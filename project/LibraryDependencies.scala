@@ -26,8 +26,8 @@ private object CompileDependencies {
   private val playVersion      = "2.5.16"
 
   private val compileDependencies: Seq[ModuleID] = Seq(
-    "com.cjww-dev.libs" %% "http-verbs"            % "2.9.0",
-    "com.cjww-dev.libs" %% "application-utilities" % "2.8.0",
+    "com.cjww-dev.libs" %% "http-verbs"            % "2.10.0",
+    "com.cjww-dev.libs" %% "application-utilities" % "2.10.0",
     "com.typesafe.play" %  "play_2.11"             % "2.5.16"
   )
 
@@ -37,9 +37,11 @@ private object CompileDependencies {
 private object TestDependencies {
   private val scalaTestVersion = "2.0.1"
   private val wireMockVersion  = "2.8.0"
+  private val mockitoVersion   = "2.12.0"
 
   private val testDependencies: Seq[ModuleID] = Seq(
     "org.scalatestplus.play" % "scalatestplus-play_2.11" % scalaTestVersion  % Test,
+    "org.mockito"            % "mockito-core"            % mockitoVersion    % Test,
     "com.github.tomakehurst" % "wiremock"                % wireMockVersion   % Test
   )
 

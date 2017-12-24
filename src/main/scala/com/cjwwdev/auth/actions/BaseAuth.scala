@@ -29,17 +29,16 @@ case class Authorised(authContext: AuthContext) extends AuthorisationResult
 case object Authenticated extends AuthorisationResult
 case object NotAuthorised extends AuthorisationResult
 
-trait BaseAuth {
-  val config: ConfigurationLoader
+trait BaseAuth extends ConfigurationLoader {
 
-  val DEVERSITY_FE_ID          = config.getApplicationId("deversity-frontend")
-  val DEVERSITY_ID             = config.getApplicationId("deversity")
-  val DIAG_ID                  = config.getApplicationId("diagnostics-frontend")
-  val HUB_ID                   = config.getApplicationId("hub-frontend")
-  val AUTH_SERVICE_ID          = config.getApplicationId("auth-service")
-  val AUTH_MICROSERVICE_ID     = config.getApplicationId("auth-microservice")
-  val ACCOUNTS_MICROSERVICE_ID = config.getApplicationId("accounts-microservice")
-  val SESSION_STORE_ID         = config.getApplicationId("session-store")
+  private val DEVERSITY_FE_ID          = getApplicationId("deversity-frontend")
+  private val DEVERSITY_ID             = getApplicationId("deversity")
+  private val DIAG_ID                  = getApplicationId("diagnostics-frontend")
+  private val HUB_ID                   = getApplicationId("hub-frontend")
+  private val AUTH_SERVICE_ID          = getApplicationId("auth-service")
+  private val AUTH_MICROSERVICE_ID     = getApplicationId("auth-microservice")
+  private val ACCOUNTS_MICROSERVICE_ID = getApplicationId("accounts-microservice")
+  private val SESSION_STORE_ID         = getApplicationId("session-store")
 
   private val idSet = List(DEVERSITY_FE_ID, DEVERSITY_ID, DIAG_ID, HUB_ID, AUTH_SERVICE_ID, AUTH_MICROSERVICE_ID, ACCOUNTS_MICROSERVICE_ID, SESSION_STORE_ID)
 
