@@ -20,7 +20,7 @@ import javax.inject.Inject
 import com.cjwwdev.auth.models.AuthContext
 import com.cjwwdev.config.ConfigurationLoader
 import com.cjwwdev.http.exceptions.NotFoundException
-import com.cjwwdev.http.utils.SessionUtils
+import com.cjwwdev.http.utils.BackendHeaderUtils
 import com.cjwwdev.http.verbs.Http
 import com.cjwwdev.security.encryption.DataSecurity
 import play.api.libs.json.JsValue
@@ -34,14 +34,14 @@ class AuthConnectorImpl @Inject()(val http: Http) extends AuthConnector with Con
   val sessionStore     = buildServiceUrl("session-store")
 }
 
-trait AuthConnector extends SessionUtils {
+trait AuthConnector extends BackendHeaderUtils {
   val http: Http
 
   val authMicroservice: String
   val sessionStore: String
 
   def getContext(implicit request: Request[_]): Future[Option[AuthContext]] = {
-    http.GET[JsValue](s"$sessionStore/session/$getCookieId/context") flatMap { response =>
+    http.GET[JsValue](s"$sessionStore/session/$getSessionId/context") flatMap { response =>
       val contextId = DataSecurity.decryptString(response.\("contextId").as[String])
       http.GET[AuthContext](s"$authMicroservice/get-context/$contextId") map {
         context => Some(context)
