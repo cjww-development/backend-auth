@@ -21,14 +21,14 @@ object LibraryDependencies {
 }
 
 private object CompileDependencies {
-  private val httpVerbsVersion = "2.6.0"
-  private val appUtilsVersion  = "2.6.0"
+  private val httpVerbsVersion = "2.12.0"
+  private val appUtilsVersion  = "2.10.0"
   private val playVersion      = "2.5.16"
 
   private val compileDependencies: Seq[ModuleID] = Seq(
-    "com.cjww-dev.libs" %% "http-verbs"            % "2.11.0",
-    "com.cjww-dev.libs" %% "application-utilities" % "2.10.0",
-    "com.typesafe.play" %  "play_2.11"             % "2.5.16"
+    "com.cjww-dev.libs" %% "http-verbs"            % httpVerbsVersion,
+    "com.cjww-dev.libs" %% "application-utilities" % appUtilsVersion,
+    "com.typesafe.play" %  "play_2.11"             % playVersion
   )
 
   def apply(): Seq[ModuleID] = compileDependencies
