@@ -21,8 +21,8 @@ object LibraryDependencies {
 }
 
 private object CompileDependencies {
-  private val httpVerbsVersion = "2.12.0"
-  private val appUtilsVersion  = "2.10.0"
+  private val httpVerbsVersion = "2.13.0"
+  private val appUtilsVersion  = "2.11.0"
   private val playVersion      = "2.5.16"
 
   private val compileDependencies: Seq[ModuleID] = Seq(
