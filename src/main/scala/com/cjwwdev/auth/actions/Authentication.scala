@@ -25,7 +25,6 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait Authentication extends BaseAuth {
-
   val authConnector: AuthConnector
 
   private val logger: Logger = LoggerFactory.getLogger(getClass)

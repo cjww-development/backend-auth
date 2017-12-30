@@ -16,13 +16,12 @@
 package com.cjwwdev.auth.actions
 
 import com.cjwwdev.auth.models.AuthContext
-import com.cjwwdev.config.ConfigurationLoader
+import com.typesafe.config.ConfigFactory
 import org.slf4j.{Logger, LoggerFactory}
-import play.api.mvc.{Request, Result}
 import play.api.mvc.Results.Forbidden
+import play.api.mvc.{Request, Result}
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 sealed trait AuthorisationResult
 case class Authorised(authContext: AuthContext) extends AuthorisationResult
@@ -30,16 +29,17 @@ case object Authenticated extends AuthorisationResult
 case object NotAuthorised extends AuthorisationResult
 
 trait BaseAuth {
-  val configurationLoader: ConfigurationLoader
+  private val config                   = ConfigFactory.load
+  private def service(service: String) = s"microservice.external-services.$service.application-id"
 
-  private val DEVERSITY_FE_ID          = configurationLoader.getApplicationId("deversity-frontend")
-  private val DEVERSITY_ID             = configurationLoader.getApplicationId("deversity")
-  private val DIAG_ID                  = configurationLoader.getApplicationId("diagnostics-frontend")
-  private val HUB_ID                   = configurationLoader.getApplicationId("hub-frontend")
-  private val AUTH_SERVICE_ID          = configurationLoader.getApplicationId("auth-service")
-  private val AUTH_MICROSERVICE_ID     = configurationLoader.getApplicationId("auth-microservice")
-  private val ACCOUNTS_MICROSERVICE_ID = configurationLoader.getApplicationId("accounts-microservice")
-  private val SESSION_STORE_ID         = configurationLoader.getApplicationId("session-store")
+  val DEVERSITY_FE_ID          = config.getString(service("deversity-frontend"))
+  val DEVERSITY_ID             = config.getString(service("deversity"))
+  val DIAG_ID                  = config.getString(service("diagnostics-frontend"))
+  val HUB_ID                   = config.getString(service("hub-frontend"))
+  val AUTH_SERVICE_ID          = config.getString(service("auth-service"))
+  val AUTH_MICROSERVICE_ID     = config.getString(service("auth-microservice"))
+  val ACCOUNTS_MICROSERVICE_ID = config.getString(service("accounts-microservice"))
+  val SESSION_STORE_ID         = config.getString(service("session-store"))
 
   private val idSet = List(DEVERSITY_FE_ID, DEVERSITY_ID, DIAG_ID, HUB_ID, AUTH_SERVICE_ID, AUTH_MICROSERVICE_ID, ACCOUNTS_MICROSERVICE_ID, SESSION_STORE_ID)
 
