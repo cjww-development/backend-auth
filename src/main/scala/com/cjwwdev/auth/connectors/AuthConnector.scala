@@ -42,7 +42,7 @@ trait AuthConnector extends BackendHeaderUtils {
 
   def getContext(implicit request: Request[_]): Future[Option[AuthContext]] = {
     http.GET[JsValue](s"$sessionStore/session/$getSessionId/context") flatMap { response =>
-      val contextId = DataSecurity.decryptIntoType[JsValue](response.\("contextId").as[String])
+      val contextId = DataSecurity.decryptString(response.\("contextId").as[String])
       http.GET[AuthContext](s"$authMicroservice/get-context/$contextId") map {
         context => Some(context)
       } recover {
