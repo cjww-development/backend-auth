@@ -20,13 +20,12 @@ import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsPath, JsResult, JsSuccess}
 
 trait JsonValidation {
-
   this: PlaySpec =>
 
   def shouldHaveErrors[T](result: JsResult[T], expectedErrors: Map[JsPath, Seq[ValidationError]]): Unit = {
     result match {
       case JsSuccess(data, _) => fail(s"read should have failed and didn't - produced $data")
-      case JsError(errors) => for((path, valErrs) <- errors) {
+      case JsError(errors)    => for((path, valErrs) <- errors) {
         expectedErrors.keySet must contain(path)
         expectedErrors(path) mustBe valErrs
       }

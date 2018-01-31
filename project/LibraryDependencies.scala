@@ -21,8 +21,8 @@ object LibraryDependencies {
 }
 
 private object CompileDependencies {
-  private val httpVerbsVersion = "2.13.0"
-  private val appUtilsVersion  = "2.11.0"
+  private val httpVerbsVersion = "2.14.0"
+  private val appUtilsVersion  = "2.14.0"
   private val playVersion      = "2.5.16"
 
   private val compileDependencies: Seq[ModuleID] = Seq(
@@ -36,13 +36,11 @@ private object CompileDependencies {
 
 private object TestDependencies {
   private val scalaTestVersion = "2.0.1"
-  private val wireMockVersion  = "2.8.0"
-  private val mockitoVersion   = "2.12.0"
+  private val mockitoVersion   = "2.13.0"
 
   private val testDependencies: Seq[ModuleID] = Seq(
     "org.scalatestplus.play" % "scalatestplus-play_2.11" % scalaTestVersion  % Test,
-    "org.mockito"            % "mockito-core"            % mockitoVersion    % Test,
-    "com.github.tomakehurst" % "wiremock"                % wireMockVersion   % Test
+    "org.mockito"            % "mockito-core"            % mockitoVersion    % Test
   )
 
   def apply(): Seq[ModuleID] = testDependencies

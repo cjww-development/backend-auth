@@ -15,24 +15,22 @@
 // limitations under the License.
 package com.cjwwdev.auth.connectors
 
+import com.cjwwdev.auth.helpers.MockHttpResponse
 import com.cjwwdev.auth.models.{AuthContext, User}
 import com.cjwwdev.http.exceptions.NotFoundException
+import com.cjwwdev.http.headers.HeaderPackage
 import com.cjwwdev.http.verbs.Http
-import com.cjwwdev.security.encryption.DataSecurity
 import org.joda.time.{DateTime, DateTimeZone}
-import org.mockito.Mockito.when
-import org.mockito.Mockito.reset
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
-class AuthConnectorSpec extends PlaySpec with MockitoSugar {
+class AuthConnectorSpec extends PlaySpec with MockitoSugar with MockHttpResponse {
 
   final val now = new DateTime(DateTimeZone.UTC)
 
@@ -55,23 +53,23 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar {
   val mockHttp = mock[Http]
 
   val testConnector = new AuthConnector {
-    override val http = mockHttp
-    override val authMicroservice = "http://test.com/auth-microservice"
-    override val sessionStore = "http://test.com/session-store"
+    override val http             = mockHttp
+    override val authMicroservice = "/auth-microservice/test/url"
+    override val sessionStore     = "/session-store/test/url"
   }
 
-  "getContext" ignore {
+  "getContext" should {
     "return an AuthContext" when {
       "given a request with a valid context id in the session" in {
-        implicit val request: FakeRequest[_] = FakeRequest().withHeaders("cookieId" -> "testCookieId")
+        implicit val request = FakeRequest()
+          .withHeaders("cjww-headers" -> HeaderPackage("testSessionStoreId", "testCookieId").encryptType)
 
-        when(mockHttp.GET[JsValue](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Json.parse("""{"contextId" : "testContextId"}""")))
+        when(mockHttp.constructHeaderPackageFromRequestHeaders(ArgumentMatchers.eq(request)))
+          .thenReturn(Some(HeaderPackage("testSessionStoreId", "testCookieId")))
 
-        //reset(mockHttp)
-
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(testContext))
+        when(mockHttp.GET(ArgumentMatchers.any())(ArgumentMatchers.eq(request)))
+          .thenReturn(Future.successful(mockWSResponseWithString(200, "testContextId")))
+          .thenReturn(Future.successful(mockWSResponse[AuthContext](200, testContext)))
 
         val result = Await.result(testConnector.getContext(request), 5.seconds)
         result mustBe Some(testContext)
@@ -80,15 +78,26 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar {
 
     "return none" when {
       "no auth context was found" in {
-        implicit val request: FakeRequest[_] = FakeRequest().withHeaders("cookieId" -> "testCookieId")
+        implicit val request = FakeRequest()
+          .withHeaders("cjww-headers" -> HeaderPackage("testSessionStoreId", "testCookieId").encryptType)
 
-        when(mockHttp.GET[JsValue](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
-          .thenReturn(Future.successful(Json.parse("""{"contextId" : "testContextId"}""")))
+        when(mockHttp.constructHeaderPackageFromRequestHeaders(ArgumentMatchers.eq(request)))
+          .thenReturn(Some(HeaderPackage("testSessionStoreId", "testCookieId")))
 
-        //reset(mockHttp)
-
-        when(mockHttp.GET[AuthContext](ArgumentMatchers.any())(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        when(mockHttp.GET(ArgumentMatchers.any())(ArgumentMatchers.any()))
+          .thenReturn(Future.successful(mockWSResponseWithString(200, "testContextId")))
           .thenReturn(Future.failed(new NotFoundException("test message")))
+
+        val result = Await.result(testConnector.getContext, 5.seconds)
+        result mustBe None
+      }
+
+      "no HeaderPackage was found in the request" in {
+        implicit val request = FakeRequest()
+          .withHeaders("cjww-headers" -> HeaderPackage("testSessionStoreId", "testCookieId").encryptType)
+
+        when(mockHttp.constructHeaderPackageFromRequestHeaders(ArgumentMatchers.eq(request)))
+          .thenReturn(None)
 
         val result = Await.result(testConnector.getContext, 5.seconds)
         result mustBe None
