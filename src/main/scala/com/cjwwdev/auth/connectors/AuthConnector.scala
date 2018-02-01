@@ -20,7 +20,6 @@ import javax.inject.Inject
 import com.cjwwdev.auth.models.AuthContext
 import com.cjwwdev.config.ConfigurationLoader
 import com.cjwwdev.http.exceptions.NotFoundException
-import com.cjwwdev.http.headers.BackendHeaderUtils
 import com.cjwwdev.http.verbs.Http
 import com.cjwwdev.implicits.ImplicitHandlers
 import play.api.mvc.Request
@@ -33,7 +32,7 @@ class AuthConnectorImpl @Inject()(val http: Http, val loadedConfig: Configuratio
   val sessionStore     = loadedConfig.buildServiceUrl("session-store")
 }
 
-trait AuthConnector extends BackendHeaderUtils with ImplicitHandlers {
+trait AuthConnector extends ImplicitHandlers {
   val http: Http
 
   val authMicroservice: String

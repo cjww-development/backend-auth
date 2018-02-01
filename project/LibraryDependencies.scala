@@ -21,7 +21,7 @@ object LibraryDependencies {
 }
 
 private object CompileDependencies {
-  private val httpVerbsVersion = "2.14.0"
+  private val httpVerbsVersion = "2.15.0"
   private val appUtilsVersion  = "2.14.0"
   private val playVersion      = "2.5.16"
 
